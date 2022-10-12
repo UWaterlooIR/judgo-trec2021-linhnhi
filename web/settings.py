@@ -125,38 +125,30 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d %(message)s'
+            'format': ('%(asctime)s [%(process)d] [%(levelname)s] ' +
+                       'pathname=%(pathname)s lineno=%(lineno)s ' +
+                       'funcname=%(funcName)s %(message)s'),
+            'datefmt': '%Y-%m-%d %H:%M:%S'
         },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        }
     },
     'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename':'./logs/logs.log',
-            'formatter': 'verbose',
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
         },
         'console': {
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
-        },
+            'formatter': 'verbose'
+        }
     },
     'loggers': {
-        '': {
-            'handlers': ['file'],
-            'level': 'INFO',
-        },
-        'django.request': {
+        'testlogger': {
             'handlers': ['console'],
             'level': 'INFO',
-        },
-        'django.security.DisallowedHost': {
-            'level': 'ERROR',
-            'handlers': ['mail_admins', ],
-            'propagate': True
         }
     }
 }
