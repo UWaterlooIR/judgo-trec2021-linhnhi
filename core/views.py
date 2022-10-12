@@ -11,7 +11,7 @@ from topic.models import Topic
 from user.models import User
 from interfaces import pref
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('testlogger')
 
 class Home(LoginRequiredMixin, generic.TemplateView):
     template_name = 'home.html'
