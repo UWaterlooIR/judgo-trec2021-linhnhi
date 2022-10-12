@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import os
 import environ
+import dj_database_url
+import django_heroku
+
 
 # Load operating system environment variables and then prepare to use them
 env = environ.Env()
@@ -26,13 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['preference-judgo.herokuapp.com', '127.0.0.1', '0.0.0.0']
 
 # Application definition
 
@@ -106,12 +108,14 @@ WSGI_APPLICATION = 'web.wsgi.application'
 DATABASES = {
 
     "default": {
-        "ENGINE":  env("ENGINE"),
-        "NAME": env("NAME"),
-        "USER": env("USER"),
-        "PASSWORD": env("PASSWORD"),
-        "HOST": env("HOST"),
-        "PORT": env("PORT"),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'ciba',
+        # "ENGINE":  env("ENGINE"),
+        # "NAME": env("NAME"),
+        # "USER": env("USER"),
+        # "PASSWORD": env("PASSWORD"),
+        # "HOST": env("HOST"),
+        # "PORT": env("PORT"),
     }
 }
 
@@ -240,6 +244,8 @@ STATICFILES_DIRS = [
     str(BASE_DIR / 'static'),
 ]
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # EMAIL CONFIGURATION
 # ------------------------------------------------------------------------------
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -262,3 +268,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS_ALLOWED_ORIGINS = [
 #     'http://localhost:3000',
 # ]
+
+django_heroku.settings(locals())
