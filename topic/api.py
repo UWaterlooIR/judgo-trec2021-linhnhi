@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, render
 
 from core.models import Task
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('testlogger')
 
 def handle_popup(request, taskId):
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
