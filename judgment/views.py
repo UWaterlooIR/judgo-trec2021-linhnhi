@@ -15,7 +15,7 @@ from document.models import Document, Response
 from judgment.models import Judgment, JudgingChoices
 from interfaces import pref
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('testlogger')
 
 class JudgmentView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'judgment.html'
