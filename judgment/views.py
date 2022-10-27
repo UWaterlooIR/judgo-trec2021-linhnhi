@@ -186,8 +186,8 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
                 )
             )
 
-        if prev_judge.is_round_done:
-            logger.info(f'One round is finished! You are going to the next step!')
+        # if prev_judge.is_round_done:
+        #     logger.info(f'One round is finished! You are going to the next step!')
 
         judgement = Judgment.objects.create(
                 user=user,

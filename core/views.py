@@ -65,7 +65,7 @@ class Home(LoginRequiredMixin, generic.TemplateView):
             if prev_judge.after_state:
                 state = prev_judge.after_state
         except Exception as e:
-            logger.warning(f"There is no previous judgment for topic = '{topic.title}' by user = '{self.request.user.username}'")
+            # logger.warning(f"There is no previous judgment for topic = '{topic.title}' by user = '{self.request.user.username}'")
             state = pref.create_new_pref_obj(topic)
                     
         if not prev_judge or prev_judge.is_complete:
