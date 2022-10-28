@@ -1,6 +1,5 @@
 from ast import literal_eval
 import html
-import logging
 from tracemalloc import start
 from operator import itemgetter
 from datetime import datetime
@@ -13,9 +12,8 @@ from django.urls import reverse_lazy
 
 from document.models import Document, Response
 from judgment.models import Judgment, JudgingChoices
-from interfaces import pref
+from interfaces import pref, add_log
 
-logger = logging.getLogger('testlogger')
 
 class JudgmentView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'judgment.html'
@@ -138,7 +136,7 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
 
         # the user is back to the same judment so we need to make a copy of this    
         if prev_judge.action != None:
-            logger.info(f"The user = '{user.username}' changed their mind about judgement {prev_judge.id} which was '{prev_judge.action}'")
+            add_log.add_log_entry(user, f"The user = '{user.username}' changed their mind about judgement {prev_judge.id} which was '{prev_judge.action}' for topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}")
             prev_judge = Judgment.objects.create(
                 user=user,
                 task=prev_judge.task,
@@ -152,8 +150,8 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
         prev_judge.after_state = after_state
         prev_judge.save()
 
-        logger.info(f"For topic_id = '{prev_judge.task.topic.uuid}' with topic_title = '{prev_judge.task.topic.title}', the user = '{user.username}' began judgement id {prev_judge.id} at {prev_judge.created_at}")
-        logger.info(f"For topic_id = '{prev_judge.task.topic.uuid}' with topic_title = '{prev_judge.task.topic.title}', the user = '{user.username}' completed action: '{prev_judge.action.label}' for judgement id {prev_judge.id} at {prev_judge.completed_at}")
+        add_log.add_log_entry(user, f"User = '{user.username}' began judgement id {prev_judge.id} at {prev_judge.created_at} for topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}")
+        add_log.add_log_entry(user, f"User = '{user.username}' completed action: '{prev_judge.action.label}' for judgement id {prev_judge.id} at {prev_judge.completed_at} for topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}")
 
 
         # check if this round of judgment is finished or not!
@@ -177,7 +175,7 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
                 prev_judge.task.save()
                 prev_judge.save()
 
-                logger.info(f"User = '{user.username}' has completed judging topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}'!")
+                add_log.add_log_entry(user, f"User = '{user.username}' has completed judging topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}'!")
 
                 return HttpResponseRedirect(
                 reverse_lazy(
