@@ -1,5 +1,6 @@
 from ast import literal_eval
 import html
+# import logging
 from tracemalloc import start
 from operator import itemgetter
 from datetime import datetime
@@ -14,6 +15,7 @@ from document.models import Document, Response
 from judgment.models import Judgment, JudgingChoices
 from interfaces import pref, add_log
 
+# logger = logging.getLogger(__name__)
 
 class JudgmentView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'judgment.html'
@@ -69,7 +71,7 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
 
             prev_judge.left_response = left_response
             prev_judge.right_response = right_response
-            prev_judge.best_answers = prev_judge.parent.best_answers if prev_judge.parent else ""
+            # prev_judge.best_answers = prev_judge.parent.best_answers if prev_judge.parent else ""
 
             prev_judge.save()
 
@@ -134,7 +136,7 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
         """
         action, after_state = JudgmentView.evaluate_after_state(requested_action, prev_judge.before_state)
 
-        # the user is back to the same judgment so we need to make a copy of this    
+        # the user is back to the same judgment so we need to make a copy of this 
         if prev_judge.action != None:
             add_log.add_log_entry(user, f"The user = '{user.username}' changed their mind about judgement {prev_judge.id} which was '{prev_judge.action}' for topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}")
             prev_judge.has_changed = True
@@ -150,7 +152,7 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
                 left_response=prev_judge.left_response,
                 right_response=prev_judge.right_response,
                 best_answers=parent_best_answer
-            )
+            )   
             
         # update pre_judge action
         prev_judge.action = action
@@ -158,9 +160,10 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
         prev_judge.after_state = after_state
         prev_judge.save()
 
+        # logger.info(f"For topic_id = '{prev_judge.task.topic.uuid}' with topic_title = '{prev_judge.task.topic.title}', the user = '{user.username}' began judgement id {prev_judge.id} at {prev_judge.created_at}")
+        # logger.info(f"For topic_id = '{prev_judge.task.topic.uuid}' with topic_title = '{prev_judge.task.topic.title}', the user = '{user.username}' completed action: '{prev_judge.action.label}' for judgement id {prev_judge.id} at {prev_judge.completed_at}")
         add_log.add_log_entry(user, f"User = '{user.username}' began judgement id {prev_judge.id} at {prev_judge.created_at} for topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}")
         add_log.add_log_entry(user, f"User = '{user.username}' completed action: '{prev_judge.action.label}' for judgement id {prev_judge.id} at {prev_judge.completed_at} for topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}")
-
 
         # check if this round of judgment is finished or not!
         while pref.is_judgment_finished(after_state):
@@ -182,6 +185,7 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
                 prev_judge.task.save()
                 prev_judge.save()
 
+                # logger.info(f"User = '{user.username}' has completed judging topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}'!")
                 add_log.add_log_entry(user, f"User = '{user.username}' has completed judging topic_id = '{prev_judge.task.topic.uuid}', topic_title = '{prev_judge.task.topic.title}'!")
 
                 return HttpResponseRedirect(
@@ -198,7 +202,8 @@ class JudgmentView(LoginRequiredMixin, generic.TemplateView):
                 user=user,
                 task=prev_judge.task,
                 before_state=after_state,
-                parent=prev_judge
+                parent=prev_judge,
+                best_answers = prev_judge.best_answers
             )
 
         user.latest_judgment = judgement
