@@ -5,6 +5,7 @@ from document.models import Document
 from .models import Judgment
 from .actions import export_task_as_csv_action
 
+
 @admin.register(Judgment)
 class JudgmentAdmin(admin.ModelAdmin):
     actions = [export_task_as_csv_action("CSV Export", fields=['id', 'user__username'])]
